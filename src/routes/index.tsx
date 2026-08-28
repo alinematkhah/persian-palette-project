@@ -191,7 +191,7 @@ function Hero() {
         </div>
 
         <div className="relative">
-          <div className="absolute inset-x-6 bottom-6 top-10 rounded-[3rem] bg-secondary/60" />
+          <div className="absolute inset-x-10 bottom-12 top-16 rounded-full bg-secondary/50 blur-3xl" />
           <img
             src={heroPeople.url}
             alt="گروهی از جوانان ایرانی با پس‌زمینه شهر و طبیعت"
