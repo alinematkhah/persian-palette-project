@@ -634,7 +634,7 @@ function Ads() {
 }
 
 function BuildWithUs() {
-  const { sent, onSubmit } = useSubmitted();
+  const { sent, pending, onSubmit } = useFormSubmit("cooperation", "پیامت به نورویش رسید. ممنون که وقت گذاشتی.");
   return (
     <section id="build" className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
@@ -651,8 +651,10 @@ function BuildWithUs() {
               <Field label="پیام" name="message" textarea />
               <button
                 type="submit"
-                className="w-full rounded-full bg-primary px-6 py-3.5 font-bold text-primary-foreground transition-transform hover:-translate-y-0.5"
+                disabled={pending}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-bold text-primary-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
+                {pending && <Loader2 className="h-4 w-4 animate-spin" />}
                 ارسال برای نورویش
               </button>
             </form>
