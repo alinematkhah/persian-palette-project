@@ -547,13 +547,34 @@ function Field({
   );
 }
 
-function useSubmitted() {
+function useFormSubmit(type: "pre_register" | "ads" | "cooperation", successMessage: string) {
   const [sent, setSent] = useState(false);
+  const [pending, startTransition] = useTransition();
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    const form = e.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+    const data = {
+      type,
+      name: String(fd.get("name") ?? "").trim(),
+      phone: String(fd.get("phone") ?? "").trim() || undefined,
+      business: String(fd.get("business") ?? "").trim() || undefined,
+      field: String(fd.get("field") ?? "").trim() || undefined,
+      contact: String(fd.get("contact") ?? "").trim() || undefined,
+      message: String(fd.get("message") ?? "").trim() || undefined,
+    };
+    startTransition(async () => {
+      try {
+        await submitForm({ data });
+        setSent(true);
+        toast.success(successMessage);
+        form.reset();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "خطا در ارسال فرم. دوباره تلاش کن.");
+      }
+    });
   };
-  return { sent, onSubmit };
+  return { sent, pending, onSubmit };
 }
 
 function Ads() {
