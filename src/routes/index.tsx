@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useTransition, type FormEvent } from "react";
 import {
   Gamepad2,
   Sparkles,
@@ -19,13 +19,16 @@ import {
   Twitter,
   ArrowLeft,
   Check,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import logo from "@/assets/logo.png.asset.json";
 import heroPeople from "@/assets/hero-people.png.asset.json";
 import mindCity from "@/assets/mind-city.png.asset.json";
 import appPhone from "@/assets/app-phone.png.asset.json";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { submitForm } from "@/lib/submissions.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
