@@ -578,7 +578,7 @@ function useFormSubmit(type: "pre_register" | "ads" | "cooperation", successMess
 }
 
 function Ads() {
-  const { sent, onSubmit } = useSubmitted();
+  const { sent, pending, onSubmit } = useFormSubmit("ads", "درخواست تبلیغات ثبت شد. به‌زودی تماس می‌گیریم.");
   return (
     <section id="ads" className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
@@ -619,8 +619,10 @@ function Ads() {
               <Field label="حوزه فعالیت" name="field" />
               <button
                 type="submit"
-                className="w-full rounded-full bg-accent px-6 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5"
+                disabled={pending}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
+                {pending && <Loader2 className="h-4 w-4 animate-spin" />}
                 می‌خواهم در نورویش تبلیغ کنم
               </button>
             </form>
