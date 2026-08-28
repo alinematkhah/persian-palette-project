@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useTransition, type FormEvent } from "react";
 import {
   Gamepad2,
   Sparkles,
@@ -19,13 +19,16 @@ import {
   Twitter,
   ArrowLeft,
   Check,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import logo from "@/assets/logo.png.asset.json";
 import heroPeople from "@/assets/hero-people.png.asset.json";
 import mindCity from "@/assets/mind-city.png.asset.json";
 import appPhone from "@/assets/app-phone.png.asset.json";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { submitForm } from "@/lib/submissions.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -544,17 +547,38 @@ function Field({
   );
 }
 
-function useSubmitted() {
+function useFormSubmit(type: "pre_register" | "ads" | "cooperation", successMessage: string) {
   const [sent, setSent] = useState(false);
+  const [pending, startTransition] = useTransition();
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    const form = e.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+    const data = {
+      type,
+      name: String(fd.get("name") ?? "").trim(),
+      phone: String(fd.get("phone") ?? "").trim() || undefined,
+      business: String(fd.get("business") ?? "").trim() || undefined,
+      field: String(fd.get("field") ?? "").trim() || undefined,
+      contact: String(fd.get("contact") ?? "").trim() || undefined,
+      message: String(fd.get("message") ?? "").trim() || undefined,
+    };
+    startTransition(async () => {
+      try {
+        await submitForm({ data });
+        setSent(true);
+        toast.success(successMessage);
+        form.reset();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "خطا در ارسال فرم. دوباره تلاش کن.");
+      }
+    });
   };
-  return { sent, onSubmit };
+  return { sent, pending, onSubmit };
 }
 
 function Ads() {
-  const { sent, onSubmit } = useSubmitted();
+  const { sent, pending, onSubmit } = useFormSubmit("ads", "درخواست تبلیغات ثبت شد. به‌زودی تماس می‌گیریم.");
   return (
     <section id="ads" className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
@@ -595,8 +619,10 @@ function Ads() {
               <Field label="حوزه فعالیت" name="field" />
               <button
                 type="submit"
-                className="w-full rounded-full bg-accent px-6 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5"
+                disabled={pending}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
+                {pending && <Loader2 className="h-4 w-4 animate-spin" />}
                 می‌خواهم در نورویش تبلیغ کنم
               </button>
             </form>
@@ -608,7 +634,7 @@ function Ads() {
 }
 
 function BuildWithUs() {
-  const { sent, onSubmit } = useSubmitted();
+  const { sent, pending, onSubmit } = useFormSubmit("cooperation", "پیامت به نورویش رسید. ممنون که وقت گذاشتی.");
   return (
     <section id="build" className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
@@ -625,8 +651,10 @@ function BuildWithUs() {
               <Field label="پیام" name="message" textarea />
               <button
                 type="submit"
-                className="w-full rounded-full bg-primary px-6 py-3.5 font-bold text-primary-foreground transition-transform hover:-translate-y-0.5"
+                disabled={pending}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-bold text-primary-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
               >
+                {pending && <Loader2 className="h-4 w-4 animate-spin" />}
                 ارسال برای نورویش
               </button>
             </form>
@@ -659,7 +687,7 @@ function BuildWithUs() {
 }
 
 function FinalCta() {
-  const { sent, onSubmit } = useSubmitted();
+  const { sent, pending, onSubmit } = useFormSubmit("pre_register", "پیش‌ثبت‌نام با موفقیت ثبت شد.");
   return (
     <section id="register" className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
       <div className="surface-panel relative overflow-hidden rounded-[2.5rem] px-6 py-14 text-center lg:px-16">
@@ -709,8 +737,10 @@ function FinalCta() {
             />
             <button
               type="submit"
-              className="rounded-full bg-accent px-7 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5"
+              disabled={pending}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
             >
+              {pending && <Loader2 className="h-4 w-4 animate-spin" />}
               پیش‌ثبت‌نام
             </button>
           </form>
