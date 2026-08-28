@@ -687,7 +687,7 @@ function BuildWithUs() {
 }
 
 function FinalCta() {
-  const { sent, onSubmit } = useSubmitted();
+  const { sent, pending, onSubmit } = useFormSubmit("pre_register", "پیش‌ثبت‌نام با موفقیت ثبت شد.");
   return (
     <section id="register" className="mx-auto max-w-6xl px-5 py-16 lg:py-24">
       <div className="surface-panel relative overflow-hidden rounded-[2.5rem] px-6 py-14 text-center lg:px-16">
@@ -737,8 +737,10 @@ function FinalCta() {
             />
             <button
               type="submit"
-              className="rounded-full bg-accent px-7 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5"
+              disabled={pending}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 font-bold text-accent-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
             >
+              {pending && <Loader2 className="h-4 w-4 animate-spin" />}
               پیش‌ثبت‌نام
             </button>
           </form>
