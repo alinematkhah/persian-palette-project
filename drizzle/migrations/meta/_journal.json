@@ -8,6 +8,13 @@
       "when": 1787899084759,
       "tag": "0000_create_submissions_and_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787995955005,
+      "tag": "0001_restrict_has_role_execute",
+      "breakpoints": true
     }
   ]
 }
