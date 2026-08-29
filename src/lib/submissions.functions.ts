@@ -29,6 +29,43 @@ export const submitForm = createServerFn({ method: "POST" })
     if (error) {
       throw new Error(error.message);
     }
+
+    // Best-effort sync to Google Sheets; sheet failure must not fail the submission.
+    try {
+      const lovableKey = process.env["LOVABLE_API_KEY"];
+      const sheetsKey = process.env["GOOGLE_SHEETS_API_KEY"];
+      if (lovableKey && sheetsKey) {
+        const res = await fetch(
+          "https://connector-gateway.lovable.dev/google_sheets/v4/spreadsheets/1B8vs4gza3N4HWfISakBFGtwglbFoLoNL6smAZUjzsbI/values/Submissions!A1:H1:append?valueInputOption=USER_ENTERED",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${lovableKey}`,
+              "X-Connection-Api-Key": sheetsKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              values: [[
+                data.type,
+                data.name,
+                data.phone ?? "",
+                data.business ?? "",
+                data.field ?? "",
+                data.contact ?? "",
+                data.message ?? "",
+                new Date().toISOString(),
+              ]],
+            }),
+          },
+        );
+        if (!res.ok) {
+          console.error("Google Sheets sync failed:", res.status, await res.text());
+        }
+      }
+    } catch (sheetError) {
+      console.error("Google Sheets sync error:", sheetError);
+    }
+
     return { ok: true };
   });
 
